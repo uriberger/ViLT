@@ -1,0 +1,10 @@
+#!/bin/sh
+
+export MASTER_ADDR=$DIST_0_IP
+export MASTER_PORT=$DIST_0_PORT
+export NODE_RANK=$DIST_RANK
+echo $MASTER_ADDR
+echo HERE
+
+#python run.py with data_root=arrows/COCO num_gpus=1 num_nodes=1 task_mlm_itm whole_word_masking=True step200k per_gpu_batchsize=64
+venv/bin/python run.py with data_root=arrows/COCO num_gpus=1 num_nodes=1 task_mlm whole_word_masking=True step200k per_gpu_batchsize=64
