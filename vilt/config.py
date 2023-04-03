@@ -92,6 +92,16 @@ def env_dandelin():
 
 # Named configs for "task" which define datasets, loss_names and desired batch_size, warmup_steps, epochs, and exp_name
 @ex.named_config
+def task_mlm():
+    exp_name = "mlm"
+    datasets = ["coco"]
+    loss_names = _loss_names({"mlm": 1})
+    batch_size = 4096
+    max_epoch = 10
+    max_image_len = 200
+
+
+@ex.named_config
 def task_mlm_itm():
     exp_name = "mlm_itm"
     datasets = ["coco", "vg", "sbu", "gcc"]
