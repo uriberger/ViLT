@@ -45,7 +45,7 @@ def make_arrow(root, dataset_root):
 
     bs = [path2rest(path, iid2captions, iid2split) for path in tqdm(caption_paths)]
 
-    for split in ["train", "val"]:
+    for split in ["train", "val", "test"]:
         batches = [b for b in bs if b[-1] == split]
 
         dataframe = pd.DataFrame(
