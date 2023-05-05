@@ -6,7 +6,7 @@ def collect_flickr_data(root_path):
     file_name = 'flickr_sentences.json'
     file_path = os.path.join(cache_dir, file_name)
     if os.path.isfile(file_path):
-        with open(file_path, 'r'):
+        with open(file_path, 'r') as fp:
             sentences = json.load(fp)
     else:
         sentences = []
