@@ -1,7 +1,8 @@
 import os
 import json
 import time
-import stanza
+from flair.data import Sentence
+from flair.models import SequenceTagger
 from acquisition.config import cache_dir, flickr_root_path
 from acquisition.collect_flickr_data import collect_flickr_data
 
@@ -12,7 +13,7 @@ def generate_nlp_data():
         with open(file_path, 'r') as fp:
             nlp_data = json.load(fp)
     else:
-        nlp = stanza.Pipeline('en')
+        tagger = SequenceTagger.load("flair/pos-english")
         nlp_data = []
         sentences = collect_flickr_data(flickr_root_path)
         
@@ -25,16 +26,16 @@ def generate_nlp_data():
                 t = time.time()
                 with open(file_path, 'w') as fp:
                     fp.write(json.dumps(nlp_data))
-            cur_data = nlp(sentence)
-            sentence_res = []
-            for token in cur_data.sentences[0].tokens:
-                token_dict = token.to_dict()[0]
-                sentence_res.append({
-                    'text': token_dict['text'],
-                    'start_char': token_dict['start_char'],
-                    'pos': token_dict['upos']
-                })
-            nlp_data.append(sentence_res)
+            
+            sentence_obj = Sentence(sentence)
+            tagger.predict(sentence_obj)
+            nlp_data.append([
+                {
+                    'text': token.text,
+                    'start_position': token.start_position,
+                    'pos': token.annotation_layers['pos'][0]._value
+                } for token in sentence_obj
+            ])
 
         with open(file_path, 'w') as fp:
             fp.write(json.dumps(nlp_data))
