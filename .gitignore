@@ -15,3 +15,4 @@ demos/
 *~
 slurm-*
 prepare.py
+cache_dir

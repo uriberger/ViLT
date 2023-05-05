@@ -22,7 +22,7 @@ def generate_nlp_data():
         for sentence in sentences:
             count_so_far = len(nlp_data)
             if count_so_far % checkpoint_len == 0:
-                print('Starting sample ' + str(count_so_far) + ' out of ' + str(len(sentences) + ', time from prev ' + str(time.time() - t)), flush=True)
+                print('Starting sample ' + str(count_so_far) + ' out of ' + str(len(sentences)) + ', time from prev ' + str(time.time() - t), flush=True)
                 t = time.time()
                 with open(file_path, 'w') as fp:
                     fp.write(json.dumps(nlp_data))
