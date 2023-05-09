@@ -1,7 +1,7 @@
 from acquisition.collect_flickr_data import collect_flickr_data
 from embed import load_model, extract_features
 import time
-from acquisition.config import cache_dir, class_to_pos_tag
+from acquisition.config import cache_dir, class_to_pos_tag, flickr_root_path
 from acquisition.generate_nlp_data import generate_nlp_data
 import os
 import torch
@@ -29,9 +29,9 @@ def generate_flickr_features():
     if os.path.isfile(output_file_path):
         return torch.load(output_file_path)
     else:
-        sentences = collect_flickr_data()
+        sentences = collect_flickr_data(flickr_root_path)
         print('Loading model...', flush=True)
-        model, tokenizer = load_model()
+        model, tokenizer = load_model('result/mlm_seed0_from_/version_0/checkpoints/epoch=0-step=138.ckpt')
 
         # Batches
         batch_size = 10
