@@ -35,7 +35,7 @@ def config():
 
     # Text Setting
     vqav2_label_size = 3129
-    max_text_len = 40
+    max_text_len = 512
     tokenizer = "bert-base-uncased"
     vocab_size = 30522
     whole_word_masking = False
