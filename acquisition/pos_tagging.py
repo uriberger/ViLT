@@ -77,27 +77,31 @@ def train_classifier(config, training_data):
 def generate_flickr_features(model_path):
     output_file_path = os.path.join(cache_dir, 'flickr_features')
     if os.path.isfile(output_file_path):
-        return torch.load(output_file_path)
+        res = torch.load(output_file_path)
     else:
-        sentences = collect_flickr_data(flickr_root_path)
-        print('Loading model...', flush=True)
-        model, tokenizer = load_model(model_path)
-
-        # Batches
-        batch_size = 10
-        batch_num = math.ceil(len(sentences)/batch_size)
-
         res = []
-        checkpoint_len = 10
-        t = time.time()
-        for batch_ind in range(batch_num):
-            if batch_ind % checkpoint_len == 0:
-                print('Starting batch ' + str(batch_ind) + ' out of ' + str(batch_num) + ', time from prev ' + str(time.time() - t), flush=True)
-                t = time.time()
-                torch.save(res, output_file_path)
-            batch_start = batch_ind * batch_size
-            batch_end = min((batch_ind + 1) * batch_size, len(sentences))
-            batch = sentences[batch_start:batch_end]
-            res.append(extract_features(batch, model, tokenizer))
-        print('Finished! Saving', flush=True)
-        torch.save(res, output_file_path)
+
+    sentences = collect_flickr_data(flickr_root_path)
+    print('Loading model...', flush=True)
+    model, tokenizer = load_model(model_path)
+
+    # Batches
+    batch_size = 10
+    first_batch = len(res)
+    batch_num = math.ceil(len(sentences)/batch_size)
+
+    checkpoint_len = 10
+    t = time.time()
+    for batch_ind in range(first_batch, batch_num):
+        if batch_ind % checkpoint_len == 0:
+            print('Starting batch ' + str(batch_ind) + ' out of ' + str(batch_num) + ', time from prev ' + str(time.time() - t), flush=True)
+            t = time.time()
+            torch.save(res, output_file_path)
+        batch_start = batch_ind * batch_size
+        batch_end = min((batch_ind + 1) * batch_size, len(sentences))
+        batch = sentences[batch_start:batch_end]
+        res.append(extract_features(batch, model, tokenizer))
+    print('Finished! Saving', flush=True)
+    torch.save(res, output_file_path)
+
+    return res
