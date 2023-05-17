@@ -24,14 +24,14 @@ def prepare_pos_tagging_data():
         } for sample in nlp_data]
     return pos_tagging_data
 
-def generate_flickr_features():
+def generate_flickr_features(model_path):
     output_file_path = os.path.join(cache_dir, 'flickr_features')
     if os.path.isfile(output_file_path):
         return torch.load(output_file_path)
     else:
         sentences = collect_flickr_data(flickr_root_path)
         print('Loading model...', flush=True)
-        model, tokenizer = load_model('result/mlm_seed0_from_/version_8/checkpoints/epoch=0-step=138.ckpt')
+        model, tokenizer = load_model(model_path)
 
         # Batches
         batch_size = 10
