@@ -16,8 +16,18 @@ def load_model(model_path):
 
 def extract_embeddings(sentences, model, tokenizer):
     with torch.no_grad():
-        input_ids = tokenizer(sentences, return_tensors='pt').input_ids
-    return model.text_embeddings(input_ids)
+        input_ids = tokenizer(sentences, padding=True, return_tensors='pt').input_ids
+    padded_embeddings = model.text_embeddings(input_ids)
+    embeddings = []
+    max_sent_len = padded_embeddings.shape[1]
+
+    for i in range(len(sentences)):
+        for j in range(max_sent_len-1, -1, -1):
+            if input_ids[i, j] != 0: # pad id is 0
+                embeddings.append(padded_embeddings[i, :j+1, :])
+                break
+
+    return embeddings
 
 def extract_features(sentences, model, tokenizer):
     with torch.no_grad():
