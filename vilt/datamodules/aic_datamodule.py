@@ -1,4 +1,4 @@
-from vilt.datasets import AICDataset
+from vilt.datasets.aic_dataset import AICDataset
 from .datamodule_base import BaseDataModule
 
 
