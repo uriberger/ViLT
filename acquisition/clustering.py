@@ -1,4 +1,5 @@
 import yaml
+import torch
 from acquisition.config import mcrae_path, subword_pooling
 from embed import load_model, extract_embeddings
 from sklearn.cluster import KMeans
