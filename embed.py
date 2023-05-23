@@ -8,6 +8,7 @@ def load_model(model_path):
     config['load_path'] = model_path
     config['tokenizer'] = 'bert-base-uncased'
     config['vocab_size'] = 30522
+    config['max_text_len'] = 512
     model = ViLTransformerSS(config)
     model.eval()
 
