@@ -143,6 +143,6 @@ def evaluate_clusters(gt_labels, predicted_labels):
 
 def evaluate_clustering(model_path):
     word_list, gt_labels, predicted_labels = create_clusters(model_path)
-    results = evaluate_clustering(gt_labels, predicted_labels)
+    results = evaluate_clusters(gt_labels, predicted_labels)
 
     return results
