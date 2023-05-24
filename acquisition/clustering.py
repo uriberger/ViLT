@@ -34,11 +34,13 @@ def create_clusters(model_path):
     all_words = [x for outer in list(category_to_word_list.values()) for x in outer]
     with torch.no_grad():
         embeddings = extract_embeddings(all_words, model, tokenizer)
-        embeddings = embeddings[:, 1:-1, :] # Remove cls and sep tokens
+        embeddings = [x[1:-1, :] for x in embeddings] # Remove cls and sep tokens
         if subword_pooling == 'mean':
-            embeddings = embeddings.mean(dim=1)
+            embeddings = [x.mean(dim=0) for x in embeddings]
         elif subword_pooling == 'last':
-            embeddings = embeddings[:, -1, :]
+            embeddings = [x[-1, :] for x in embeddings]
+        embeddings = [x.unsqueeze(dim=0) for x in embeddings]
+        embeddings = torch.cat(embeddings, dim=0)
 
     kmeans = KMeans(n_clusters=41).fit(embeddings)
     cluster_list = list(kmeans.labels_)
