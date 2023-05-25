@@ -49,8 +49,9 @@ def create_clusters(model_path):
     for category, word_list in category_to_word_list.items():
         for word in word_list:
             word_to_category[word] = category
+    all_words = [x for outer in category_to_word_list.values() for x in outer]
 
-    return word_list, [word_to_category[x] for x in word_list], cluster_list
+    return all_words, [word_to_category[x] for x in all_words], cluster_list
 
 def aggregate_intersection_counts(gt_labels, predicted_labels):
     cluster_to_gt_intersection = {}
