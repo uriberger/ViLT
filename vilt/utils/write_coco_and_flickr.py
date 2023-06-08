@@ -19,8 +19,8 @@ def path2rest(path, iid2captions, iid2split):
 
 
 def make_arrow(root, dataset_root):
-    def generate_bs(dataset_name, image_dirs):
-        with open(f"{root}/{dataset_name}/karpathy/dataset_coco.json", "r") as fp:
+    def generate_bs(dataset_name, json_name, image_dirs):
+        with open(f"{root}/{dataset_name}/karpathy/{json_name}.json", "r") as fp:
             captions = json.load(fp)
 
         captions = captions["images"]
@@ -51,8 +51,8 @@ def make_arrow(root, dataset_root):
 
         return bs
     
-    coco_bs = generate_bs('COCO', ['train2014', 'val2014'])
-    flickr_bs = generate_bs('flickr30', 'images')
+    coco_bs = generate_bs('COCO', 'dataset_coco', ['train2014', 'val2014'])
+    flickr_bs = generate_bs('flickr30', 'dataset_flickr30k', 'images')
     bs = coco_bs + flickr_bs
 
     for split in ["train", "val", "restval", "test"]:
