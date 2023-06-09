@@ -34,7 +34,7 @@ def make_arrow(root, dataset_root):
             for c in cap["sentences"]:
                 iid2captions[filename].append(c["raw"])
 
-        path_lists = [list(glob(f"{root}/{image_dir}/*.jpg")) for image_dir in image_dirs]
+        path_lists = [list(glob(f"{root}/{dataset_name}/{image_dir}/*.jpg")) for image_dir in image_dirs]
         paths = sum(path_lists, [])
         random.shuffle(paths)
         caption_paths = [path for path in paths if path.split("/")[-1] in iid2captions]
