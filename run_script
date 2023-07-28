@@ -8,4 +8,4 @@ export NODE_RANK=0
 echo $MASTER_ADDR
 echo HERE
 
-venv/bin/python run.py with data_root=arrows/COCO num_gpus=1 num_nodes=1 task_mlm whole_word_masking=True step200k per_gpu_batchsize=64
+venv/bin/python run.py with data_root=arrows num_gpus=1 num_nodes=1 task_mlm whole_word_masking=True step200k per_gpu_batchsize=16

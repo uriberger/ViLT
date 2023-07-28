@@ -94,7 +94,7 @@ def env_dandelin():
 @ex.named_config
 def task_mlm():
     exp_name = "mlm"
-    datasets = ["coco"]
+    datasets = ["coco", "gcc", "f30k"]
     loss_names = _loss_names({"mlm": 1})
     batch_size = 4096
     max_epoch = 10
