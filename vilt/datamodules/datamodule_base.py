@@ -36,7 +36,7 @@ class BaseDataModule(LightningDataModule):
         self.draw_false_image = _config["draw_false_image"]
         self.draw_false_text = _config["draw_false_text"]
         self.image_only = _config["image_only"]
-        self.noize_images = _config["noise_images"]
+        self.noise_images = _config["noise_images"]
 
         self.train_transform_keys = (
             ["default_train"]
