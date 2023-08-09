@@ -32,6 +32,7 @@ def config():
     patch_size = 32
     draw_false_image = 1
     image_only = False
+    noise_images = False
 
     # Text Setting
     vqav2_label_size = 3129

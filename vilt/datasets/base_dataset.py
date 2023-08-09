@@ -3,6 +3,7 @@ import torch
 import io
 import pyarrow as pa
 import os
+import numpy as np
 
 from PIL import Image
 from vilt.transforms import keys_to_transforms
@@ -21,6 +22,7 @@ class BaseDataset(torch.utils.data.Dataset):
         draw_false_image=0,
         draw_false_text=0,
         image_only=False,
+        noise_images=False
     ):
         """
         data_dir : where dataset file *.arrow lives; existence should be guaranteed via DataModule.prepare_data
@@ -37,6 +39,7 @@ class BaseDataset(torch.utils.data.Dataset):
         self.draw_false_image = draw_false_image
         self.draw_false_text = draw_false_text
         self.image_only = image_only
+        self.noize_images = noise_images
         self.data_dir = data_dir
 
         if len(names) != 0:
@@ -93,6 +96,9 @@ class BaseDataset(torch.utils.data.Dataset):
 
     def get_image(self, index, image_key="image"):
         image = self.get_raw_image(index, image_key=image_key)
+        if self.noise_images:
+            imarray = np.random.rand(image.size[1], image.size[0], 3)*255
+            image = Image.fromarray(imarray.astype('uint8')).convert('RGB')
         image_tensor = [tr(image) for tr in self.transforms]
         return {
             "image": image_tensor,

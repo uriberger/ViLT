@@ -36,6 +36,7 @@ class BaseDataModule(LightningDataModule):
         self.draw_false_image = _config["draw_false_image"]
         self.draw_false_text = _config["draw_false_text"]
         self.image_only = _config["image_only"]
+        self.noize_images = _config["noise_images"]
 
         self.train_transform_keys = (
             ["default_train"]
@@ -82,6 +83,7 @@ class BaseDataModule(LightningDataModule):
             draw_false_image=self.draw_false_image,
             draw_false_text=self.draw_false_text,
             image_only=self.image_only,
+            noise_images=self.noise_images
         )
 
     def set_val_dataset(self):
