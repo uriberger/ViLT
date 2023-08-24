@@ -1,9 +1,7 @@
 import yaml
-import torch
-from acquisition.config import mcrae_path, subword_pooling
-from embed import load_model, extract_embeddings
-from sklearn.cluster import KMeans
+from acquisition.config import mcrae_path
 from sklearn.metrics.cluster import v_measure_score
+from acquisition.clustering.clustering_utils import create_clusters
 
 def build_category_dataset(input_file_path):
     with open(input_file_path) as f:
@@ -24,34 +22,6 @@ def build_category_dataset(input_file_path):
                                     for categ in all_categories}
 
         return category_to_word_list
-
-def create_clusters(model_path):
-    category_to_word_list = build_category_dataset(mcrae_path)
-    model, tokenizer = load_model(model_path)
-    model.eval()
-
-    # Create embeddings
-    all_words = [x for outer in list(category_to_word_list.values()) for x in outer]
-    with torch.no_grad():
-        embeddings = extract_embeddings(all_words, model, tokenizer)
-        embeddings = [x[1:-1, :] for x in embeddings] # Remove cls and sep tokens
-        if subword_pooling == 'mean':
-            embeddings = [x.mean(dim=0) for x in embeddings]
-        elif subword_pooling == 'last':
-            embeddings = [x[-1, :] for x in embeddings]
-        embeddings = [x.unsqueeze(dim=0) for x in embeddings]
-        embeddings = torch.cat(embeddings, dim=0)
-
-    kmeans = KMeans(n_clusters=41).fit(embeddings)
-    cluster_list = list(kmeans.labels_)
-
-    word_to_category = {}
-    for category, word_list in category_to_word_list.items():
-        for word in word_list:
-            word_to_category[word] = category
-    all_words = [x for outer in category_to_word_list.values() for x in outer]
-
-    return all_words, [word_to_category[x] for x in all_words], cluster_list
 
 def aggregate_intersection_counts(gt_labels, predicted_labels):
     cluster_to_gt_intersection = {}
@@ -143,7 +113,19 @@ def evaluate_clusters(gt_labels, predicted_labels):
     }
 
 def evaluate_clustering(model_path):
-    word_list, gt_labels, predicted_labels = create_clusters(model_path)
+    category_to_word_list = build_category_dataset(mcrae_path)
+    all_words = [x for outer in list(category_to_word_list.values()) for x in outer]
+    cluster_list = create_clusters(model_path, all_words, 41)
+
+    word_to_category = {}
+    for category, word_list in category_to_word_list.items():
+        for word in word_list:
+            word_to_category[word] = category
+    all_words = [x for outer in category_to_word_list.values() for x in outer]
+
+    gt_labels = [word_to_category[x] for x in all_words],
+    predicted_labels = cluster_list
+
     results = evaluate_clusters(gt_labels, predicted_labels)
 
     return results
