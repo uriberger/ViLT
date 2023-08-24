@@ -39,7 +39,7 @@ class BaseDataset(torch.utils.data.Dataset):
         self.draw_false_image = draw_false_image
         self.draw_false_text = draw_false_text
         self.image_only = image_only
-        self.noize_images = noise_images
+        self.noise_images = noise_images
         self.data_dir = data_dir
 
         if len(names) != 0:
