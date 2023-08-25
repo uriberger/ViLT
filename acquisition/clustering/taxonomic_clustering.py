@@ -123,7 +123,7 @@ def evaluate_clustering(model_path):
             word_to_category[word] = category
     all_words = [x for outer in category_to_word_list.values() for x in outer]
 
-    gt_labels = [word_to_category[x] for x in all_words],
+    gt_labels = [word_to_category[x] for x in all_words]
     predicted_labels = cluster_list
 
     results = evaluate_clusters(gt_labels, predicted_labels)
