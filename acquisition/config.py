@@ -1,6 +1,7 @@
 cache_dir = 'cache_dir'
 flickr_root_path = '/cs/labs/oabend/uriber/datasets/flickr30'
 mcrae_path = '/cs/labs/oabend/uriber/datasets/mcrae_typicality.yaml'
+swow_path = '/cs/labs/oabend/uriber/datasets/swow.en.csv'
 class_to_pos_tag = [
     # Nouns:
     ['NN', 'NNS', 'NNP', 'WP', 'NNPS', 'WP$'],
