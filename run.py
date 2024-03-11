@@ -25,6 +25,9 @@ def main(_config):
         mode="max",
         save_last=True,
     )
+    logger_name = f'{exp_name}_seed{_config["seed"]}'
+    if _config["noise_images"]:
+        logger_name += '_noise_images'
     logger = pl.loggers.TensorBoardLogger(
         _config["log_dir"],
         name=f'{exp_name}_seed{_config["seed"]}_from_{_config["load_path"].split("/")[-1][:-5]}',
