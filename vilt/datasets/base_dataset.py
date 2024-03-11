@@ -41,6 +41,7 @@ class BaseDataset(torch.utils.data.Dataset):
         self.image_only = image_only
         self.noise_images = noise_images
         self.data_dir = data_dir
+        self.generated_sample_image = False
 
         if len(names) != 0:
             tables = [
@@ -99,6 +100,9 @@ class BaseDataset(torch.utils.data.Dataset):
         if self.noise_images:
             imarray = np.random.rand(image.size[1], image.size[0], 3)*255
             image = Image.fromarray(imarray.astype('uint8')).convert('RGB')
+        if not self.generated_sample_image:
+            image.save('sample.jpg')
+            self.generated_sample_image = True
         image_tensor = [tr(image) for tr in self.transforms]
         return {
             "image": image_tensor,
