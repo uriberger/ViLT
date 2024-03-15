@@ -10,19 +10,19 @@ from acquisition.trainer import create_trainer
 from tqdm import tqdm
 import random
 
-def generate_flickr_features(model_path):
+def generate_features(model_path, sentences):
     output_file_path = os.path.join(cache_dir, 'flickr_features')
     if os.path.isfile(output_file_path):
         res = torch.load(output_file_path)
     else:
         res = []
 
-    sentences = collect_flickr_data(flickr_root_path)
     print('Loading model...', flush=True)
     model, tokenizer = load_model(model_path)
+    model.to(torch.device('cuda'))
 
     # Batches
-    batch_size = 10
+    batch_size = 4
     first_batch = len(res)
     batch_num = math.ceil(len(sentences)/batch_size)
 
@@ -40,8 +40,8 @@ def generate_flickr_features(model_path):
     return res
 
 def get_data(model_path):
-    flickr_features = generate_flickr_features(model_path)
-    sentences = collect_flickr_data(flickr_json_path)
+    sentences = collect_flickr_data(flickr_root_path, split='test')
+    flickr_features = generate_features(model_path, sentences)
     flickr_pos_data = generate_pos_data(sentences)
 
     assert len(flickr_features) == len(flickr_pos_data)
