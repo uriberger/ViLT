@@ -1,20 +1,23 @@
 from torch.utils.data import DataLoader
 import torch.optim as optim
+from tqdm import tqdm
+import torch
 
 class Trainer:
-    def __init__(self, model, training_data, config):
-        self.model = model
-        self.training_data = training_data
+    def __init__(self, classifier, config, train_data, test_data):
+        self.classifier = classifier
         self.config = config
+        self.train_data = train_data
+        self.test_data = test_data
 
 class NeuralTrainer:
-    def __init__(model, training_data, config):
-        super.__init__(model, training_data, config)
+    def __init__(self, model, train_data, test_data, config):
+        super.__init__(self, model, train_data, test_data, config)
 
     def train(self):
-        dataloader = DataLoader(self.training_data, batch_size=64, shuffle=True)
+        dataloader = DataLoader(self.train_data, batch_size=64, shuffle=True)
         criterion = self.config.criterion_class()
-        optimizer = optim.Adam(self.model.parameters())
+        optimizer = optim.Adam(self.classifier.parameters())
         checkpoint_len = 100
 
         for epoch_ind in range(10):
@@ -23,7 +26,7 @@ class NeuralTrainer:
                 inputs, labels = data
                 optimizer.zero_grad()
 
-                outputs = self.model(inputs)
+                outputs = self.classifier(inputs)
                 loss = criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
@@ -33,11 +36,26 @@ class NeuralTrainer:
                     print(f'[{epoch_ind }, {i + 1:5d}] loss: {running_loss / checkpoint_len:.3f}')
                     running_loss = 0.0
 
+    def evaluate(self):
+        dataloader = DataLoader(self.test_data, batch_size=64)
+        correct = 0
+
+        for data in tqdm(dataloader):
+            inputs, labels = data
+
+            with torch.no_grad():
+                outputs = self.classifier(inputs)
+            
+            correct += [i for i in range(len(labels)) if outputs[i] == labels[i]]
+
+        return correct/len(dataloader)
+
 class SVMTrainer:
     def __init__(model, training_data, config):
         super.__init__(model, training_data, config)
 
     def train(self):
+        return False
         
 
 def create_trainer(config, training_data):

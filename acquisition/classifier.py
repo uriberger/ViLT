@@ -69,15 +69,15 @@ class SVMClassifier:
         return torch.from_numpy(self.clf.predict(input_features))
 
 
-def create_model(model_config):
-    if model_config.classifier == 'neural':
+def create_classifier(classifier_config):
+    if classifier_config.classifier == 'neural':
         return NeuralClassifier(
-            model_config.activation_func,
-            model_config.layer_size_list,
-            model_config.use_batch_norm
+            classifier_config.activation_func,
+            classifier_config.layer_size_list,
+            classifier_config.use_batch_norm
             )
-    elif model_config.classifier == 'svm':
+    elif classifier_config.classifier == 'svm':
         return SVMClassifier(
-            model_config.svm_kernel,
-            model_config.standardize_data
+            classifier_config.svm_kernel,
+            classifier_config.standardize_data
             )

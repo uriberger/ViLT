@@ -1,5 +1,8 @@
+import os
+
 cache_dir = 'cache_dir'
 flickr_root_path = '/cs/labs/oabend/uriber/datasets/flickr30'
+flickr_json_path = os.path.join(flickr_root_path, 'karpathy', 'dataset_flickr30k.json')
 mcrae_path = '/cs/labs/oabend/uriber/datasets/mcrae_typicality.yaml'
 swow_path = '/cs/labs/oabend/uriber/datasets/swow.en.csv'
 class_to_pos_tag = [
