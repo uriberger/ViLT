@@ -56,7 +56,7 @@ class NeuralTrainer(Trainer):
             
             correct += len([i for i in range(len(labels)) if predicted_classes[i] == labels[i]])
             for i in range(len(labels)):
-                res_mat[outputs[i].item(), labels[i].item()] += 1
+                res_mat[predicted_classes[i].item(), labels[i].item()] += 1
 
         return correct/len(dataloader), res_mat
 
