@@ -11,7 +11,7 @@ class Trainer:
         self.train_data = train_data
         self.test_data = test_data
 
-class NeuralTrainer:
+class NeuralTrainer(Trainer):
     def __init__(self, model, train_data, test_data, config):
         super.__init__(self, model, train_data, test_data, config)
 
