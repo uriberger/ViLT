@@ -59,9 +59,9 @@ def extract_features(sentences, model, tokenizer, agg_subtokens_method=None):
             cur_token_start_ind = None
             feature_vectors = []
             for i, text_id in enumerate(batch['text_ids'][sent_ind]):
-                if text_id == 101:
+                if text_id.item() == 101:
                     continue
-                if text_id == 102:
+                if text_id.item() == 102:
                     break
                 id_str = tokenizer.decode(text_id)
                 if id_str.startswith('##'):
@@ -70,7 +70,7 @@ def extract_features(sentences, model, tokenizer, agg_subtokens_method=None):
                     feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
                     feature_vectors.append(feature_vector)
                 cur_token_start_ind = i
-            feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:token_num, :], agg_subtokens_method)
+            feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
             feature_vectors.append(feature_vector)
 
             feature_vectors = [x.unsqueeze(dim=0) for x in feature_vectors]
