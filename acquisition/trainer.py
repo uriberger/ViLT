@@ -52,8 +52,9 @@ class NeuralTrainer(Trainer):
 
             with torch.no_grad():
                 outputs = self.classifier(inputs)
+            predicted_classes = torch.max(outputs, dim=1)[1]
             
-            correct += [i for i in range(len(labels)) if outputs[i] == labels[i]]
+            correct += len([i for i in range(len(labels)) if predicted_classes[i] == labels[i]])
             for i in range(len(labels)):
                 res_mat[outputs[i], labels[i]] += 1
 
