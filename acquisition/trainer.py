@@ -13,8 +13,9 @@ class Trainer:
         self.test_data = test_data
 
 class NeuralTrainer(Trainer):
-    def __init__(self, model, train_data, test_data, config):
-        super(NeuralTrainer, self).__init__(model, train_data, test_data, config)
+    def __init__(self, classifier, train_data, test_data, config):
+        super(NeuralTrainer, self).__init__(classifier, train_data, test_data, config)
+        self.device = torch.device('cuda')
 
     def train(self):
         dataloader = DataLoader(self.train_data, batch_size=64, shuffle=True)
@@ -26,6 +27,8 @@ class NeuralTrainer(Trainer):
             running_loss = 0.0
             for i, data in enumerate(dataloader):
                 inputs, labels = data
+                inputs.to(self.device)
+                labels.to(self.device)
                 optimizer.zero_grad()
 
                 outputs = self.classifier(inputs)
