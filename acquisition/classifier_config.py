@@ -1,4 +1,4 @@
-class ModelConfig:
+class ClassifierConfig:
     def __init__(self):
         self.classifier = 'neural',
         # Nerual related attributes

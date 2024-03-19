@@ -2,6 +2,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 from tqdm import tqdm
 import torch
+import numpy as np
 
 class Trainer:
     def __init__(self, classifier, config, train_data, test_data):
@@ -39,6 +40,8 @@ class NeuralTrainer:
     def evaluate(self):
         dataloader = DataLoader(self.test_data, batch_size=64)
         correct = 0
+        class_num = self.config.layer_size_list[-1]
+        res_mat = np.zeros((class_num, class_num))
 
         for data in tqdm(dataloader):
             inputs, labels = data
@@ -47,8 +50,10 @@ class NeuralTrainer:
                 outputs = self.classifier(inputs)
             
             correct += [i for i in range(len(labels)) if outputs[i] == labels[i]]
+            for i in range(len(labels)):
+                res_mat[outputs[i], labels[i]] += 1
 
-        return correct/len(dataloader)
+        return correct/len(dataloader), res_mat
 
 class SVMTrainer:
     def __init__(model, training_data, config):

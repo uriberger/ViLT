@@ -55,8 +55,6 @@ def get_data(model_path):
             continue
         data += [(feature_vectors[i], pos_data[i]['label']) for i in range(len(pos_data))]
 
-    print(f'[get_data] Filtered {len(flickr_pos_data)-len(data)} out of {len(flickr_pos_data)} samples')
-
     random.shuffle(data)
     train_sample_num = int(0.8*len(data))
     train_data = data[:train_sample_num]
@@ -64,10 +62,10 @@ def get_data(model_path):
 
     return train_data, test_data
 
-def train_classifier(model, classifier_config):
-    train_data, test_data = get_data(model)
+def train_classifier(model_path, classifier_config):
+    train_data, test_data = get_data(model_path)
     classifier = create_classifier(classifier_config)
     trainer = create_trainer(classifier, classifier_config, train_data, test_data)
     trainer.train()
-    accuracy = trainer.evaluate()
-    return accuracy
+    accuracy, res_mat = trainer.evaluate()
+    return accuracy, res_mat
