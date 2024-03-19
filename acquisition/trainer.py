@@ -13,7 +13,7 @@ class Trainer:
 
 class NeuralTrainer(Trainer):
     def __init__(self, model, train_data, test_data, config):
-        super.__init__(self, model, train_data, test_data, config)
+        super(Trainer, self).__init__(model, train_data, test_data, config)
 
     def train(self):
         dataloader = DataLoader(self.train_data, batch_size=64, shuffle=True)
