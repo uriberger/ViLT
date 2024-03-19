@@ -31,7 +31,6 @@ def generate_pos_data(sentences):
             tagger.predict(sentence_obj)
             pos_data.append([
                 {
-                    'sent_index': count,
                     'text': token.text,
                     'start_position': token.start_position,
                     'label': pos_tag_to_class[token.annotation_layers['pos'][0]._value]

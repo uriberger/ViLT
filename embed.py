@@ -66,6 +66,10 @@ def extract_features(sentences, model, tokenizer, agg_subtokens_method=None):
                 id_str = tokenizer.decode(text_id)
                 if id_str.startswith('##'):
                     continue
+                if id_str == "'" and i < len(batch['text_ids'][sent_ind]) - 1 and tokenizer.decode(batch['text_ids'][sent_ind][i+1]) == 's':
+                    continue
+                if i < len(batch['text_ids'][sent_ind]) - 1 and tokenizer.decode(batch['text_ids'][sent_ind][i+1]) == '-':
+                    continue
                 elif cur_token_start_ind is not None:
                     feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
                     feature_vectors.append(feature_vector)

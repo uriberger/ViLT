@@ -1,6 +1,6 @@
 from acquisition.collect_flickr_data import collect_flickr_data
 from embed import load_model, extract_features
-from acquisition.config import cache_dir, flickr_root_path, flickr_json_path
+from acquisition.config import cache_dir, flickr_json_path
 from acquisition.pos_tagging.generate_pos_data import generate_pos_data
 import os
 import torch
@@ -12,6 +12,8 @@ import random
 
 def generate_features(model_path, sentences):
     output_file_path = os.path.join(cache_dir, 'flickr_features')
+    if not os.path.isdir(cache_dir):
+        os.mkdir(cache_dir)
     if os.path.isfile(output_file_path):
         res = torch.load(output_file_path)
     else:
@@ -40,7 +42,7 @@ def generate_features(model_path, sentences):
     return res
 
 def get_data(model_path):
-    sentences = collect_flickr_data(flickr_root_path, split='test')
+    sentences = collect_flickr_data(flickr_json_path, split='test')
     flickr_features = generate_features(model_path, sentences)
     flickr_pos_data = generate_pos_data(sentences)
 
@@ -49,7 +51,7 @@ def get_data(model_path):
     # Features and pos data were created using different tokenizers, filter sentences that were tokenized differently
     data = []
     for feature_vectors, pos_data in zip(flickr_features, flickr_pos_data):
-        if len(feature_vectors.shape[0] != pos_data[0]):
+        if feature_vectors.shape[0] != len(pos_data):
             continue
         data += [(feature_vectors[i], pos_data[i]['label']) for i in range(len(pos_data))]
 
