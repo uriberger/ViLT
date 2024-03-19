@@ -11,7 +11,7 @@ for class_ind in range(len(class_to_pos_tag)):
     for pos_tag in class_to_pos_tag[class_ind]:
         pos_tag_to_class[pos_tag] = class_ind
 
-def generate_pos_data(sentences):
+def generate_pos_data(sentences, binary):
     file_name = 'flickr_pos_data.json'
     file_path = os.path.join(cache_dir, file_name)
     if os.path.isfile(file_path):
@@ -29,13 +29,22 @@ def generate_pos_data(sentences):
             
             sentence_obj = Sentence(sentence)
             tagger.predict(sentence_obj)
-            pos_data.append([
-                {
-                    'text': token.text,
-                    'start_position': token.start_position,
-                    'label': pos_tag_to_class[token.annotation_layers['pos'][0]._value]
-                } for token in sentence_obj
-            ])
+            if binary:
+                pos_data.append([
+                    {
+                        'text': token.text,
+                        'start_position': token.start_position,
+                        'label': 1 if pos_tag_to_class[token.annotation_layers['pos'][0]._value] == 0 else 0
+                    } for token in sentence_obj
+                ])
+            else:
+                pos_data.append([
+                    {
+                        'text': token.text,
+                        'start_position': token.start_position,
+                        'label': pos_tag_to_class[token.annotation_layers['pos'][0]._value]
+                    } for token in sentence_obj
+                ])
 
         with open(file_path, 'w') as fp:
             fp.write(json.dumps(pos_data))

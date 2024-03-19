@@ -41,10 +41,10 @@ def generate_features(model_path, sentences):
 
     return res
 
-def get_data(model_path):
+def get_data(model_path, binary):
     sentences = collect_flickr_data(flickr_json_path, split='test')
     flickr_features = generate_features(model_path, sentences)
-    flickr_pos_data = generate_pos_data(sentences)
+    flickr_pos_data = generate_pos_data(sentences, binary)
 
     assert len(flickr_features) == len(flickr_pos_data)
 
@@ -62,8 +62,8 @@ def get_data(model_path):
 
     return train_data, test_data
 
-def train_classifier(model_path, classifier_config):
-    train_data, test_data = get_data(model_path)
+def train_classifier(model_path, classifier_config, binary):
+    train_data, test_data = get_data(model_path, binary)
     classifier = create_classifier(classifier_config).to(torch.device('cuda'))
     trainer = create_trainer(classifier, classifier_config, train_data, test_data)
     trainer.train()
