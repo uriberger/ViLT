@@ -27,8 +27,8 @@ class NeuralTrainer(Trainer):
             running_loss = 0.0
             for i, data in enumerate(dataloader):
                 inputs, labels = data
-                inputs.to(self.device)
-                labels.to(self.device)
+                inputs = inputs.to(self.device)
+                labels = labels.to(self.device)
                 optimizer.zero_grad()
 
                 outputs = self.classifier(inputs)
