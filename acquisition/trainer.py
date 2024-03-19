@@ -63,10 +63,10 @@ class SVMTrainer:
         return False
         
 
-def create_trainer(config, training_data):
-    if config.classifier == 'neural':
-        return NeuralTrainer(training_data)
-    elif config.classifier == 'svm':
-        return SVMTrainer(training_data)
+def create_trainer(classifier, classifier_config, train_data, test_data):
+    if classifier_config.classifier_type == 'neural':
+        return NeuralTrainer(classifier, classifier_config, train_data, test_data)
+    elif classifier_config.classifier_type == 'svm':
+        return SVMTrainer(classifier, classifier_config, train_data, test_data)
     else:
-        assert False, 'Classifier ' + config.classifier + ' unknown'
+        assert False, 'Classifier ' + classifier_config.classifier_type + ' unknown'

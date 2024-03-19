@@ -70,13 +70,13 @@ class SVMClassifier:
 
 
 def create_classifier(classifier_config):
-    if classifier_config.classifier == 'neural':
+    if classifier_config.classifier_type == 'neural':
         return NeuralClassifier(
             classifier_config.activation_func,
             classifier_config.layer_size_list,
             classifier_config.use_batch_norm
             )
-    elif classifier_config.classifier == 'svm':
+    elif classifier_config.classifier_type == 'svm':
         return SVMClassifier(
             classifier_config.svm_kernel,
             classifier_config.standardize_data

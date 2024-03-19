@@ -1,6 +1,6 @@
 class ClassifierConfig:
     def __init__(self):
-        self.classifier = 'neural',
+        self.classifier_type = 'neural',
         # Nerual related attributes
         self.activation_func = 'relu', # 'relu', 'sigmoid' or 'tanh'
         self.layer_size_list = [1],
