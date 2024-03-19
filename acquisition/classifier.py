@@ -26,7 +26,7 @@ class NeuralClassifier(nn.Module):
         else:
             assert False
 
-        input_size = 784
+        input_size = 768
 
         layers = []
         cur_input_size = input_size
