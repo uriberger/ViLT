@@ -3,6 +3,7 @@ import torch.optim as optim
 from tqdm import tqdm
 import torch
 import numpy as np
+import torch.nn.functional as F
 
 class Trainer:
     def __init__(self, classifier, config, train_data, test_data):
@@ -17,7 +18,7 @@ class NeuralTrainer(Trainer):
 
     def train(self):
         dataloader = DataLoader(self.train_data, batch_size=64, shuffle=True)
-        criterion = self.config.criterion_class()
+        criterion = F.cross_entropy
         optimizer = optim.Adam(self.classifier.parameters())
         checkpoint_len = 100
 
