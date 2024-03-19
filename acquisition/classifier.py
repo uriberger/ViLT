@@ -16,7 +16,7 @@ class NeuralClassifier(nn.Module):
         self.classification_head.to(device)
 
     @staticmethod
-    def get_classification_head(activation_func, layer_size_list, class_num, use_batch_norm):
+    def get_classification_head(activation_func, layer_size_list, use_batch_norm):
         if activation_func == 'relu':
             activation_func_class = nn.ReLU
         elif activation_func == 'sigmoid':
@@ -36,10 +36,6 @@ class NeuralClassifier(nn.Module):
                 layers.append(nn.BatchNorm1d(cur_output_size))
             layers.append(activation_func_class())
             cur_input_size = cur_output_size
-        layers.append(nn.Linear(cur_input_size, class_num))
-        if use_batch_norm:
-            layers.append(nn.BatchNorm1d(class_num))
-        layers.append(activation_func_class())
         layers.append(nn.Softmax(dim=1))
         return nn.Sequential(*layers)
 
