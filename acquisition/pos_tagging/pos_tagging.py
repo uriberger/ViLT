@@ -64,7 +64,7 @@ def get_data(model_path, binary):
 
 def train_classifier(model_path, classifier_config, binary):
     train_data, test_data = get_data(model_path, binary)
-    classifier = create_classifier(classifier_config).to(torch.device('cuda'))
+    classifier = create_classifier(classifier_config)
     trainer = create_trainer(classifier, classifier_config, train_data, test_data)
     trainer.train()
     accuracy, res_mat = trainer.evaluate()
