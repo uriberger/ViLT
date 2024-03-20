@@ -60,13 +60,16 @@ class NeuralTrainer(Trainer):
 
         return correct/len(dataloader), res_mat
 
-class SVMTrainer:
-    def __init__(model, training_data, config):
-        super.__init__(model, training_data, config)
+class SVMTrainer(Trainer):
+    def __init__(self, classifier, train_data, test_data, config):
+        super(SVMTrainer, self).__init__(classifier, train_data, test_data, config)
 
     def train(self):
-        return False
-        
+        X = np.concatenate([x[0].cpu() for x in self.train_data])
+        y = np.array([x[1] for x in self.train_data])
+        print('[SVM trainer] training...', flush=True)
+        self.classifier.fit(X, y)
+        print('[SVM trainer] Finished training', flush=True)
 
 def create_trainer(classifier, classifier_config, train_data, test_data):
     if classifier_config.classifier_type == 'neural':

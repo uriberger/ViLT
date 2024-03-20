@@ -57,7 +57,7 @@ class SVMClassifier:
         if self.standardize_data:
             self.scale = StandardScaler().fit(training_mat)
             training_mat = self.scale.transform(training_mat)
-        self.clf.fit(training_mat, label_mat)
+        self.classifier.fit(training_mat, label_mat)
 
     def predict(self, input_features):
         if self.standardize_data:
