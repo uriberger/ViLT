@@ -65,15 +65,15 @@ class SVMTrainer(Trainer):
         super(SVMTrainer, self).__init__(classifier, train_data, test_data, config)
 
     def train(self):
-        X = np.concatenate([x[0].cpu() for x in self.train_data])
+        X = np.stack([x[0].cpu() for x in self.train_data])
         y = np.array([x[1] for x in self.train_data])
         print('[SVM trainer] training...', flush=True)
         self.classifier.fit(X, y)
         print('[SVM trainer] Finished training', flush=True)
 
     def evaluate(self):
-        X = np.concatenate([x[0].cpu() for x in self.test_data])
-        y = np.array([x[1] for x in self.train_data])
+        X = np.stack([x[0].cpu() for x in self.test_data])
+        y = np.array([x[1] for x in self.test_data])
         predicted = self.classifier.predict(X)
         correct = len([i for i in range(len(predicted)) if predicted[i] == y[i]])
         class_num = len(set(list(y)))
@@ -82,7 +82,7 @@ class SVMTrainer(Trainer):
         for pred, gt in zip(predicted, y):
             res_mat[pred, gt] += 1
 
-        return correct/len(predicted), res_mat
+        return correct/predicted.shape[0], res_mat
 
 def create_trainer(classifier, classifier_config, train_data, test_data):
     if classifier_config.classifier_type == 'neural':

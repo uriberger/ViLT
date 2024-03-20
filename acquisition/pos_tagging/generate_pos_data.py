@@ -12,7 +12,8 @@ for class_ind in range(len(class_to_pos_tag)):
         pos_tag_to_class[pos_tag] = class_ind
 
 def generate_pos_data(sentences, binary):
-    file_name = 'flickr_pos_data.json'
+    binary_str = '_binary' if binary else ''
+    file_name = f'flickr_pos_data{binary_str}.json'
     file_path = os.path.join(cache_dir, file_name)
     if os.path.isfile(file_path):
         with open(file_path, 'r') as fp:

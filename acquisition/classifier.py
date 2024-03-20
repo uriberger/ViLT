@@ -62,7 +62,7 @@ class SVMClassifier:
     def predict(self, input_features):
         if self.standardize_data:
             input_features = self.scale.transform(input_features)
-        return torch.from_numpy(self.clf.predict(input_features))
+        return self.classifier.predict(input_features)
 
 
 def create_classifier(classifier_config):
