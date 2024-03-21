@@ -11,7 +11,7 @@ from tqdm import tqdm
 import random
 from datasets import load_dataset
 
-def generate_features(model_path, sentences):
+def generate_features(model_path, sentences, agg_edge_cases=[]):
     output_file_path = os.path.join(cache_dir, 'flickr_features')
     if not os.path.isdir(cache_dir):
         os.mkdir(cache_dir)
@@ -36,7 +36,7 @@ def generate_features(model_path, sentences):
         batch_start = batch_ind * batch_size
         batch_end = min((batch_ind + 1) * batch_size, len(sentences))
         batch = sentences[batch_start:batch_end]
-        res += extract_features(batch, model, tokenizer, agg_subtokens_method='mean')
+        res += extract_features(batch, model, tokenizer, agg_subtokens_method='mean', agg_edge_cases=agg_edge_cases)
     print('Finished! Saving', flush=True)
     torch.save(res, output_file_path)
 
@@ -70,9 +70,10 @@ def get_data(model_path, binary, dataset):
     if dataset == 'flickr30k':
         sentences = collect_flickr_data(flickr_json_path, split='test')
         pos_data = generate_pos_data(sentences, binary)
+        features = generate_features(model_path, sentences, agg_edge_cases=["'s", '-'])
     elif dataset == 'ontonotes':
         sentences, pos_data = get_ontonotes_data(split='test', binary=binary)
-    features = generate_features(model_path, sentences)
+        features = generate_features(model_path, sentences, agg_edge_cases=["'s"])
 
     assert len(features) == len(pos_data)
 
