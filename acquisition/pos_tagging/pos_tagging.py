@@ -28,14 +28,15 @@ def generate_features(model_path, sentences=None, tokens=None):
     # Batches
     batch_size = 4
     first_batch = len(res)
-    batch_num = math.ceil(len(sentences)/batch_size)
+    sample_num = len(sentences) if sentences is not None else len(tokens)
+    batch_num = math.ceil(sample_num/batch_size)
 
     checkpoint_len = 10
     for batch_ind in tqdm(range(first_batch, batch_num)):
         if batch_ind % checkpoint_len == 0:
             torch.save(res, output_file_path)
         batch_start = batch_ind * batch_size
-        batch_end = min((batch_ind + 1) * batch_size, len(sentences))
+        batch_end = min((batch_ind + 1) * batch_size, sample_num)
         if sentences is not None:
             batch = sentences[batch_start:batch_end]
             res += extract_features_from_sentences(batch, model, tokenizer, agg_subtokens_method='mean')
