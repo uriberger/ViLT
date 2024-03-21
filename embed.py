@@ -96,9 +96,9 @@ def extract_features_from_tokens(token_lists, model, tokenizer, agg_subtokens_me
 
     text_feats = res['text_feats']
     feature_list = []
-    token_ind = 0
-    cur_token = ''
     for sent_ind in range(len(sentences)):
+        token_ind = 0
+        cur_token = ''
         failed = False
         prev_token_end_ind = 0
         feature_vectors = []
