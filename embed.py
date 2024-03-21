@@ -120,7 +120,7 @@ def extract_features_from_tokens(token_lists, model, tokenizer, agg_subtokens_me
                 token_ind += 1
                 cur_token = ''
             elif len(cur_token) > len(token_lists[sent_ind][token_ind]):
-                assert cur_token.startswith(token_lists[sent_ind][token_ind])
+                assert cur_token.startswith(token_lists[sent_ind][token_ind]), f'Something wrong in the following sentence: {token_lists[sent_ind]} in token number {token_ind}, i.e. {token_lists[sent_ind][token_ind]}'
                 feature_list.append(None)
                 failed = True
                 break
