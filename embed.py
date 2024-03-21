@@ -113,14 +113,14 @@ def extract_features_from_tokens(token_lists, model, tokenizer, agg_subtokens_me
             else:
                 cur_token += id_str
 
-            if cur_token == token_lists[sent_ind][token_ind]:
+            if cur_token.lower() == token_lists[sent_ind][token_ind].lower():
                 feature_vector = agg_feature_vectors(text_feats[sent_ind, prev_token_end_ind+1:i+1, :], agg_subtokens_method)
                 feature_vectors.append(feature_vector)
                 prev_token_end_ind = i
                 token_ind += 1
                 cur_token = ''
             elif len(cur_token) > len(token_lists[sent_ind][token_ind]):
-                assert cur_token.startswith(token_lists[sent_ind][token_ind]), f'Something wrong in the following sentence: {token_lists[sent_ind]} in token number {token_ind}, i.e. {token_lists[sent_ind][token_ind]}'
+                assert cur_token.lower().startswith(token_lists[sent_ind][token_ind].lower()), f'Something wrong in the following sentence: {token_lists[sent_ind]} in token number {token_ind}, i.e. {token_lists[sent_ind][token_ind]}'
                 feature_list.append(None)
                 failed = True
                 break
