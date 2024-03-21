@@ -40,7 +40,7 @@ def agg_feature_vectors(feature_vectors, method):
     else:
         assert False, f'Unknown feature aggregation method: {method}'
 
-def extract_features(sentences, model, tokenizer, agg_subtokens_method=None, agg_edge_cases=[]):
+def extract_features_from_sentences(sentences, model, tokenizer, agg_subtokens_method):
     with torch.no_grad():
         tokenized_input = tokenizer(sentences, padding=True, return_tensors='pt')
         batch = {}
@@ -54,35 +54,79 @@ def extract_features(sentences, model, tokenizer, agg_subtokens_method=None, agg
     text_feats = res['text_feats']
     feature_list = []
     for sent_ind in range(len(sentences)):
-        token_num = torch.sum(batch['text_masks'][sent_ind]).item()
-        if agg_subtokens_method is not None:
-            cur_token_start_ind = None
-            feature_vectors = []
-            for i, text_id in enumerate(batch['text_ids'][sent_ind]):
-                if text_id.item() == 101:
-                    continue
-                if text_id.item() == 102:
-                    break
-                id_str = tokenizer.decode(text_id)
-                if id_str.startswith('##'):
-                    continue
-                if "'s" in agg_edge_cases:
-                    if id_str == "'" and i < len(batch['text_ids'][sent_ind]) - 1 and tokenizer.decode(batch['text_ids'][sent_ind][i+1]) == 's':
-                        continue
-                if '-' in agg_edge_cases:
-                    if i < len(batch['text_ids'][sent_ind]) - 1 and tokenizer.decode(batch['text_ids'][sent_ind][i+1]) == '-':
-                        continue
-                    if id_str == '-':
-                        continue
-                elif cur_token_start_ind is not None:
-                    feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
-                    feature_vectors.append(feature_vector)
-                cur_token_start_ind = i
-            feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
-            feature_vectors.append(feature_vector)
+        cur_token_start_ind = None
+        feature_vectors = []
+        for i, text_id in enumerate(batch['text_ids'][sent_ind]):
+            if text_id.item() == 101:
+                continue
+            if text_id.item() == 102:
+                break
+            id_str = tokenizer.decode(text_id)
+            if id_str.startswith('##'):
+                continue
+            if id_str == "'" and i < len(batch['text_ids'][sent_ind]) - 1 and tokenizer.decode(batch['text_ids'][sent_ind][i+1]) == 's':
+                continue
+            if i < len(batch['text_ids'][sent_ind]) - 1 and tokenizer.decode(batch['text_ids'][sent_ind][i+1]) == '-':
+                continue
+            if id_str == '-':
+                continue
+            elif cur_token_start_ind is not None:
+                feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
+                feature_vectors.append(feature_vector)
+            cur_token_start_ind = i
+        feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
+        feature_vectors.append(feature_vector)
 
+        feature_vectors = [x.unsqueeze(dim=0) for x in feature_vectors]
+        feature_list.append(torch.cat(feature_vectors, dim=0))
+        
+    return feature_list
+
+def extract_features_from_tokens(token_lists, model, tokenizer, agg_subtokens_method):
+    sentences = [' '.join(x) for x in token_lists]
+    with torch.no_grad():
+        tokenized_input = tokenizer(sentences, padding=True, return_tensors='pt')
+        batch = {}
+        batch['text_ids'] = tokenized_input.input_ids.to(model.device)
+        batch['text_masks'] = tokenized_input.attention_mask.to(model.device)
+        batch['text_labels'] = tokenized_input.input_ids.to(model.device)
+        batch['image'] = torch.ones(1, len(sentences), 3, 224, 224).to(model.device)
+        
+        res = model.infer(batch)
+
+    text_feats = res['text_feats']
+    feature_list = []
+    token_ind = 0
+    cur_token = ''
+    for sent_ind in range(len(sentences)):
+        failed = False
+        prev_token_end_ind = 0
+        feature_vectors = []
+        for i, text_id in enumerate(batch['text_ids'][sent_ind]):
+            if text_id.item() == 101:
+                continue
+            if text_id.item() == 102:
+                break
+            id_str = tokenizer.decode(text_id)
+            if id_str.startswith('##'):
+                cur_token += id_str[2:]
+            else:
+                cur_token += id_str
+
+            if cur_token == token_lists[sent_ind][token_ind]:
+                feature_vector = agg_feature_vectors(text_feats[sent_ind, prev_token_end_ind+1:i+1, :], agg_subtokens_method)
+                feature_vectors.append(feature_vector)
+                prev_token_end_ind = i
+                token_ind += 1
+                cur_token = ''
+            elif len(cur_token) > len(token_lists[sent_ind][token_ind]):
+                assert cur_token.startswith(token_lists[sent_ind][token_ind])
+                feature_list.append(None)
+                failed = True
+                break
+
+        if not failed:
             feature_vectors = [x.unsqueeze(dim=0) for x in feature_vectors]
             feature_list.append(torch.cat(feature_vectors, dim=0))
-        else:
-            feature_list.append(text_feats[sent_ind, :token_num, :])
+
     return feature_list

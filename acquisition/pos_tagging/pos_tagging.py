@@ -1,5 +1,5 @@
 from acquisition.collect_flickr_data import collect_flickr_data
-from embed import load_model, extract_features
+from embed import load_model, extract_features_from_sentences, extract_features_from_tokens
 from acquisition.config import cache_dir, flickr_json_path, pos_tag_to_class, ontonotes_pos_tags
 from acquisition.pos_tagging.generate_pos_data import generate_pos_data
 import os
@@ -11,7 +11,8 @@ from tqdm import tqdm
 import random
 from datasets import load_dataset
 
-def generate_features(model_path, sentences, agg_edge_cases=[]):
+def generate_features(model_path, sentences=None, tokens=None):
+    assert bool(sentences is None) != bool(tokens is None), f'Exactly one of sentences and tokens should be none'
     output_file_path = os.path.join(cache_dir, 'flickr_features')
     if not os.path.isdir(cache_dir):
         os.mkdir(cache_dir)
@@ -35,8 +36,12 @@ def generate_features(model_path, sentences, agg_edge_cases=[]):
             torch.save(res, output_file_path)
         batch_start = batch_ind * batch_size
         batch_end = min((batch_ind + 1) * batch_size, len(sentences))
-        batch = sentences[batch_start:batch_end]
-        res += extract_features(batch, model, tokenizer, agg_subtokens_method='mean', agg_edge_cases=agg_edge_cases)
+        if sentences is not None:
+            batch = sentences[batch_start:batch_end]
+            res += extract_features_from_sentences(batch, model, tokenizer, agg_subtokens_method='mean')
+        else:
+            batch = tokens[batch_start:batch_end]
+            res += extract_features_from_tokens(batch, model, tokenizer, agg_subtokens_method='mean')
     print('Finished! Saving', flush=True)
     torch.save(res, output_file_path)
 
@@ -44,11 +49,11 @@ def generate_features(model_path, sentences, agg_edge_cases=[]):
 
 def get_ontonotes_data(split, binary):
     dataset = load_dataset('conll2012_ontonotesv5', 'english_v12')
-    sentences = []
+    token_lists = []
     pos_data = []
     for doc in dataset[split]:
         for sentence_obj in doc['sentences']:
-            sentences.append(' '.join(sentence_obj['words']))
+            token_lists.append(sentence_obj['words'])
             if binary:
                 pos_data.append([
                     {
@@ -64,23 +69,23 @@ def get_ontonotes_data(split, binary):
                     } for word, pos_tag in zip(sentence_obj['words'], sentence_obj['pos_tags'])
                 ])
 
-    return sentences, pos_data
+    return token_lists, pos_data
 
 def get_data(model_path, binary, dataset):
     if dataset == 'flickr30k':
         sentences = collect_flickr_data(flickr_json_path, split='test')
         pos_data = generate_pos_data(sentences, binary)
-        features = generate_features(model_path, sentences, agg_edge_cases=["'s", '-'])
+        features = generate_features(model_path, sentences=sentences, tokens=None)
     elif dataset == 'ontonotes':
-        sentences, pos_data = get_ontonotes_data(split='test', binary=binary)
-        features = generate_features(model_path, sentences, agg_edge_cases=["'s"])
+        tokens, pos_data = get_ontonotes_data(split='test', binary=binary)
+        features = generate_features(model_path, sentences=None, tokens=tokens)
 
     assert len(features) == len(pos_data)
 
     # Features and pos data were created using different tokenizers, filter sentences that were tokenized differently
     data = []
     for feature_vectors, pos_data in zip(features, pos_data):
-        if feature_vectors.shape[0] != len(pos_data):
+        if feature_vectors is None or feature_vectors.shape[0] != len(pos_data):
             continue
         data += [(feature_vectors[i], pos_data[i]['label']) for i in range(len(pos_data))]
 
