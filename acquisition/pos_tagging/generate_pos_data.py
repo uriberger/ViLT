@@ -4,12 +4,7 @@ from flair.data import Sentence
 from flair.models import SequenceTagger
 from acquisition.config import cache_dir
 from tqdm import tqdm
-from acquisition.config import class_to_pos_tag
-
-pos_tag_to_class = {}
-for class_ind in range(len(class_to_pos_tag)):
-    for pos_tag in class_to_pos_tag[class_ind]:
-        pos_tag_to_class[pos_tag] = class_ind
+from acquisition.config import pos_tag_to_class
 
 def generate_pos_data(sentences, binary):
     binary_str = '_binary' if binary else ''
