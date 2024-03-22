@@ -1,7 +1,6 @@
 from acquisition.classifier import create_classifier
 from acquisition.trainer import create_trainer
 from acquisition.classifier_config import ClassifierConfig
-import random
 from acquisition.config import cache_dir
 import os
 import torch
@@ -108,4 +107,4 @@ def run_wsd_experiment(noise_images, version):
     files_in_dir = [x for x in os.listdir(dir_path) if x.startswith('epoch')]
     assert len(files_in_dir) == 1
     model_path = os.path.join(dir_path, files_in_dir[0])
-    train_classifier(model_path, config)
+    return train_classifier(model_path, config)
