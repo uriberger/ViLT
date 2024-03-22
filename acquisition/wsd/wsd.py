@@ -92,7 +92,10 @@ def train_classifier(model_path, classifier_config):
 def run_wsd_experiment(noise_images, version):
     config = ClassifierConfig()
     config.classifier_type = 'svm'
-    os.remove(f'cache_dir/wic_features')
+    if os.path.isfile('cache_dir/wic_features_train'):
+        os.remove('cache_dir/wic_features_train')
+    if os.path.isfile('cache_dir/wic_features_test'):
+        os.remove('cache_dir/wic_features_test')
     noise_images_str = ''
     if noise_images:
         noise_images_str = '_noise_images'
