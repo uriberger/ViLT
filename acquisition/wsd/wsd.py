@@ -33,7 +33,7 @@ def get_wic_data(split):
     return sentences, labels
 
 def generate_features_for_wic(model_path, sentences, split):
-    output_file_path = os.path.join(cache_dir, f'wid_features_{split}')
+    output_file_path = os.path.join(cache_dir, f'wic_features_{split}')
     if os.path.isfile(output_file_path):
         res = torch.load(output_file_path)
     else:
@@ -49,6 +49,7 @@ def generate_features_for_wic(model_path, sentences, split):
     sample_num = len(sentences)
     batch_num = math.ceil(sample_num/batch_size)
 
+    failed_inds = []
     checkpoint_len = 10
     for batch_ind in tqdm(range(first_batch, batch_num)):
         if batch_ind % checkpoint_len == 0:
@@ -58,17 +59,21 @@ def generate_features_for_wic(model_path, sentences, split):
         batch = [sentences[i][0][0] for i in range(batch_start, batch_end)] + [sentences[i][1][0] for i in range(batch_start, batch_end)]
         cur_features = extract_features_from_tokens(batch, model, tokenizer, agg_subtokens_method='mean')
         for i in range(batch_size):
+            if cur_features[i] is None or cur_features[batch_size+i] is None:
+                failed_inds.append(batch_ind*batch_size+i)
+                continue
             vec1 = cur_features[i][sentences[batch_start+i][0][1]]
             vec2 = cur_features[batch_size+i][sentences[batch_start+i][1][1]]
             res.append(torch.cat([vec1, vec2]))
     print('Finished! Saving', flush=True)
     torch.save(res, output_file_path)
 
-    return res
+    return res, failed_inds
 
 def get_data_for_split(model_path, split):
     sentences, labels = get_wic_data(split=split)
-    features = generate_features_for_wic(model_path, sentences, split=split)
+    features, failed_inds = generate_features_for_wic(model_path, sentences, split=split)
+    labels = [labels[i] for i in range(len(labels)) if i not in failed_inds]
 
     assert len(features) == len(labels)
 
