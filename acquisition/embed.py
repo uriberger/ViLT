@@ -1,7 +1,12 @@
 from vilt.config import config as vilt_config
 from vilt.modules import ViLTransformerSS
+from acquisition.config import cache_dir
 from transformers import AutoTokenizer
+
 import torch
+import os
+import math
+from tqdm import tqdm
 
 def load_model(model_path):
     config = vilt_config()
@@ -130,3 +135,40 @@ def extract_features_from_tokens(token_lists, model, tokenizer, agg_subtokens_me
             feature_list.append(torch.cat(feature_vectors, dim=0))
 
     return feature_list
+
+def generate_features(model_path, output_file_name, sentences=None, tokens=None):
+    assert bool(sentences is None) != bool(tokens is None), f'Exactly one of sentences and tokens should be none'
+    output_file_path = os.path.join(cache_dir, output_file_name)
+    if not os.path.isdir(cache_dir):
+        os.mkdir(cache_dir)
+    if os.path.isfile(output_file_path):
+        res = torch.load(output_file_path)
+    else:
+        res = []
+
+    print('Loading model...', flush=True)
+    model, tokenizer = load_model(model_path)
+    model.to(torch.device('cuda'))
+
+    # Batches
+    batch_size = 4
+    first_batch = len(res)
+    sample_num = len(sentences) if sentences is not None else len(tokens)
+    batch_num = math.ceil(sample_num/batch_size)
+
+    checkpoint_len = 10
+    for batch_ind in tqdm(range(first_batch, batch_num)):
+        if batch_ind % checkpoint_len == 0:
+            torch.save(res, output_file_path)
+        batch_start = batch_ind * batch_size
+        batch_end = min((batch_ind + 1) * batch_size, sample_num)
+        if sentences is not None:
+            batch = sentences[batch_start:batch_end]
+            res += extract_features_from_sentences(batch, model, tokenizer, agg_subtokens_method='mean')
+        else:
+            batch = tokens[batch_start:batch_end]
+            res += extract_features_from_tokens(batch, model, tokenizer, agg_subtokens_method='mean')
+    print('Finished! Saving', flush=True)
+    torch.save(res, output_file_path)
+
+    return res

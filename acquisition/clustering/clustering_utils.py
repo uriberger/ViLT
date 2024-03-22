@@ -1,4 +1,4 @@
-from embed import load_model, extract_embeddings
+from acquisition.embed import load_model, extract_embeddings
 import torch
 from acquisition.config import subword_pooling
 from sklearn.cluster import KMeans
