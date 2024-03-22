@@ -32,8 +32,8 @@ def get_wic_data(split):
 
     return sentences, labels
 
-def generate_features_for_wic(model_path, sentences):
-    output_file_path = os.path.join(cache_dir, 'wid_features')
+def generate_features_for_wic(model_path, sentences, split):
+    output_file_path = os.path.join(cache_dir, f'wid_features_{split}')
     if os.path.isfile(output_file_path):
         res = torch.load(output_file_path)
     else:
@@ -64,28 +64,25 @@ def generate_features_for_wic(model_path, sentences):
     print('Finished! Saving', flush=True)
     torch.save(res, output_file_path)
 
-def get_data(model_path):
-    sentences, labels = get_wic_data(split='test')
-    features = generate_features_for_wic(model_path, sentences)
+    return res
+
+def get_data_for_split(model_path, split):
+    sentences, labels = get_wic_data(split=split)
+    features = generate_features_for_wic(model_path, sentences, split=split)
 
     assert len(features) == len(labels)
 
-    # Features and pos data were created using different tokenizers, filter sentences that were tokenized differently
     data = []
     for feature_vector, label in zip(features, labels):
         if feature_vector is None:
             continue
         data.append((feature_vector, label))
 
-    random.shuffle(data)
-    train_sample_num = int(0.8*len(data))
-    train_data = data[:train_sample_num]
-    test_data = data[train_sample_num:]
-
-    return train_data, test_data
+    return data
 
 def train_classifier(model_path, classifier_config):
-    train_data, test_data = get_data(model_path)
+    train_data = get_data_for_split(model_path, 'train')
+    test_data = get_data_for_split(model_path, 'test')
     classifier = create_classifier(classifier_config)
     trainer = create_trainer(classifier, classifier_config, train_data, test_data)
     trainer.train()
@@ -100,7 +97,7 @@ def run_wsd_experiment(noise_images, version):
     if noise_images:
         noise_images_str = '_noise_images'
     dir_path = f'result/mlm_itm_seed0{noise_images_str}/version_{version}/checkpoints'
-    files_in_dir = os.listdir(dir_path)
+    files_in_dir = [x for x in os.listdir(dir_path) if x.startswith('epoch')]
     assert len(files_in_dir) == 1
     model_path = os.path.join(dir_path, files_in_dir[0])
     train_classifier(model_path, config)
