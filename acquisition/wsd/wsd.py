@@ -16,7 +16,7 @@ def get_wic_data(split):
     sentences = []
     with open(os.path.join(dir_path, f'{split}.data.txt'), 'r') as fp:
         for line in fp:
-            line_parts = line.strip.split('\t')
+            line_parts = line.strip().split('\t')
             target_word_inds = line_parts[2]
             target_word_ind1 = int(target_word_inds.split('-')[0])
             target_word_ind2 = int(target_word_inds.split('-')[1])
@@ -57,12 +57,10 @@ def generate_features_for_wic(model_path, sentences):
         batch_end = min((batch_ind + 1) * batch_size, sample_num)
         batch = [sentences[i][0][0] for i in range(batch_start, batch_end)] + [sentences[i][1][0] for i in range(batch_start, batch_end)]
         cur_features = extract_features_from_tokens(batch, model, tokenizer, agg_subtokens_method='mean')
-        batch_size = batch_end - batch_start
         for i in range(batch_size):
             vec1 = cur_features[i][sentences[batch_start+i][0][1]]
-            vec2 = cur_features[i][sentences[batch_start+i][1][1]]
-            feature_vectors = [x.unsqueeze(dim=0) for x in feature_vectors]
-            res.append(torch.cat([vec1.unsqueeze(dim=0), vec2.unsqueeze(dim=0)], dim=0))
+            vec2 = cur_features[batch_size+i][sentences[batch_start+i][1][1]]
+            res.append(torch.cat([vec1, vec2]))
     print('Finished! Saving', flush=True)
     torch.save(res, output_file_path)
 
