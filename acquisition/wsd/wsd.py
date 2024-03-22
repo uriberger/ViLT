@@ -5,7 +5,7 @@ import random
 from acquisition.config import cache_dir
 import os
 import torch
-from embed import load_model, extract_features_from_tokens
+from acquisition.embed import load_model, extract_features_from_tokens
 import math
 from tqdm import tqdm
 
