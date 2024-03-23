@@ -74,7 +74,7 @@ def run_pos_tagging_experiment(noise_images, version, dataset):
     if noise_images:
         noise_images_str = '_noise_images'
     dir_path = f'result/mlm_itm_seed0{noise_images_str}/version_{version}/checkpoints'
-    files_in_dir = os.listdir(dir_path)
+    files_in_dir = [x for x in os.listdir(dir_path) if x.startswith('epoch')]
     assert len(files_in_dir) == 1
     model_path = os.path.join(dir_path, files_in_dir[0])
-    train_classifier(model_path, config, True, dataset)
+    return train_classifier(model_path, config, True, dataset)

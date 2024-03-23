@@ -35,13 +35,19 @@ def extract_embeddings(sentences, model, tokenizer):
 
     return embeddings
 
-def agg_feature_vectors(feature_vectors, method):
+def embed_word(word, model, tokenizer, agg_method):
+    with torch.no_grad():
+        input_ids = tokenizer(word, padding=True, return_tensors='pt').input_ids
+    embeddings = model.text_embeddings(input_ids[:, 1:-1])[0, :, :]
+    return agg_vectors(embeddings, agg_method)
+
+def agg_vectors(vectors, method):
     if method == 'mean':
-        return torch.mean(feature_vectors, dim=0)
+        return torch.mean(vectors, dim=0)
     elif method == 'first':
-        return feature_vectors[0]
+        return vectors[0]
     elif method == 'last':
-        return feature_vectors[-1]
+        return vectors[-1]
     else:
         assert False, f'Unknown feature aggregation method: {method}'
 
@@ -76,10 +82,10 @@ def extract_features_from_sentences(sentences, model, tokenizer, agg_subtokens_m
             if id_str == '-':
                 continue
             elif cur_token_start_ind is not None:
-                feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
+                feature_vector = agg_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
                 feature_vectors.append(feature_vector)
             cur_token_start_ind = i
-        feature_vector = agg_feature_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
+        feature_vector = agg_vectors(text_feats[sent_ind, cur_token_start_ind:i, :], agg_subtokens_method)
         feature_vectors.append(feature_vector)
 
         feature_vectors = [x.unsqueeze(dim=0) for x in feature_vectors]
@@ -119,7 +125,7 @@ def extract_features_from_tokens(token_lists, model, tokenizer, agg_subtokens_me
                 cur_token += id_str
 
             if cur_token.lower() == token_lists[sent_ind][token_ind].lower():
-                feature_vector = agg_feature_vectors(text_feats[sent_ind, prev_token_end_ind+1:i+1, :], agg_subtokens_method)
+                feature_vector = agg_vectors(text_feats[sent_ind, prev_token_end_ind+1:i+1, :], agg_subtokens_method)
                 feature_vectors.append(feature_vector)
                 prev_token_end_ind = i
                 token_ind += 1
