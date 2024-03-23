@@ -82,7 +82,7 @@ def train_classifier(model_path, classifier_config):
     accuracy, res_mat = trainer.evaluate()
     return accuracy, res_mat
 
-def run_concreteness_experiment(noise_images, version, dataset):
+def run_concreteness_experiment(noise_images, version):
     config = ClassifierConfig()
     config.classifier_type = 'svm'
     noise_images_str = ''
@@ -92,4 +92,4 @@ def run_concreteness_experiment(noise_images, version, dataset):
     files_in_dir = [x for x in os.listdir(dir_path) if x.startswith('epoch')]
     assert len(files_in_dir) == 1
     model_path = os.path.join(dir_path, files_in_dir[0])
-    return train_classifier(model_path, config, True, dataset)
+    return train_classifier(model_path, config)
