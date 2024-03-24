@@ -79,4 +79,4 @@ def create_classifier(classifier_config):
             classifier_config.standardize_data
             )
     elif classifier_config.classifier_type == 'linear_regression':
-        LinearRegression()
+        return LinearRegression()
