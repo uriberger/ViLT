@@ -78,8 +78,8 @@ def train_classifier(model_path, classifier_config):
     classifier = create_classifier(classifier_config)
     trainer = create_trainer(classifier, classifier_config, train_data, test_data)
     trainer.train()
-    accuracy, res_mat = trainer.evaluate()
-    return accuracy, res_mat
+    msd = trainer.evaluate()
+    return msd
 
 def run_concreteness_experiment(noise_images, version):
     config = ClassifierConfig()
