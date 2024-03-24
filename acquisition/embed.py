@@ -38,7 +38,7 @@ def extract_embeddings(sentences, model, tokenizer):
 def embed_word(word, model, tokenizer, agg_method):
     with torch.no_grad():
         input_ids = tokenizer(word, padding=True, return_tensors='pt').input_ids.to(model.device)
-    embeddings = model.text_embeddings(input_ids[:, 1:-1])[0, :, :]
+        embeddings = model.text_embeddings(input_ids[:, 1:-1])[0, :, :]
     return agg_vectors(embeddings, agg_method)
 
 def agg_vectors(vectors, method):
