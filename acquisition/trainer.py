@@ -83,11 +83,31 @@ class SVMTrainer(Trainer):
             res_mat[pred, gt] += 1
 
         return correct/predicted.shape[0], res_mat
+    
+class LinearRegressionTrainer(Trainer):
+    def __init__(self, classifier, train_data, test_data, config):
+        super(LinearRegressionTrainer, self).__init__(classifier, train_data, test_data, config)
+
+    def train(self):
+        X = np.stack([x[0].cpu() for x in self.train_data])
+        y = np.array([x[1] for x in self.train_data])
+        print('[Linear regression trainer] training...', flush=True)
+        self.classifier.fit(X, y)
+        print('[Linear regression trainer] Finished training', flush=True)
+
+    def evaluate(self):
+        X = np.stack([x[0].cpu() for x in self.test_data])
+        y = np.array([x[1] for x in self.test_data])
+        predicted = self.classifier.predict(X)
+
+        return np.mean(np.square(y-predicted))
 
 def create_trainer(classifier, classifier_config, train_data, test_data):
     if classifier_config.classifier_type == 'neural':
         return NeuralTrainer(classifier, classifier_config, train_data, test_data)
     elif classifier_config.classifier_type == 'svm':
         return SVMTrainer(classifier, classifier_config, train_data, test_data)
+    elif classifier_config.classifier_type == 'linear_regression':
+        return LinearRegressionTrainer(classifier, classifier_config, train_data, test_data)
     else:
         assert False, 'Classifier ' + classifier_config.classifier_type + ' unknown'

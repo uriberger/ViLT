@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
 
 class NeuralClassifier(nn.Module):
     def __init__(self, activation_func, layer_size_list, use_batch_norm):
@@ -77,3 +78,5 @@ def create_classifier(classifier_config):
             classifier_config.svm_kernel,
             classifier_config.standardize_data
             )
+    elif classifier_config.classifier_type == 'linear_regression':
+        LinearRegression()

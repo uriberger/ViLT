@@ -5,7 +5,6 @@ from acquisition.embed import load_model, embed_word
 import random
 import os
 import torch
-import math
 from tqdm import tqdm
 
 def get_mcrae_data():
@@ -59,7 +58,7 @@ def generate_token_embeddings(model_path, tokens):
 
     return res
 
-def get_data(model_path,):
+def get_data(model_path):
     tokens, concreteness = get_mcrae_data()
     features = generate_token_embeddings(model_path, tokens)
 
@@ -84,7 +83,7 @@ def train_classifier(model_path, classifier_config):
 
 def run_concreteness_experiment(noise_images, version):
     config = ClassifierConfig()
-    config.classifier_type = 'svm'
+    config.classifier_type = 'linear_regression'
     noise_images_str = ''
     if noise_images:
         noise_images_str = '_noise_images'
