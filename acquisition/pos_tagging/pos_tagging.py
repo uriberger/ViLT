@@ -37,7 +37,7 @@ def get_data(model_path, binary, dataset):
     if dataset == 'flickr30k':
         sentences = collect_flickr_data(flickr_json_path, split='test')
         pos_data = generate_pos_data(sentences, binary, 'flickr30k')
-        features = generate_features(model_path, 'flickr_features', sentences=sentences, tokens=None)
+        features = generate_features(model_path, 'flickr30k_features', sentences=sentences, tokens=None)
     elif dataset == 'ontonotes':
         tokens, pos_data = get_ontonotes_data(split='test', binary=binary)
         features = generate_features(model_path, 'ontonotes_features', sentences=None, tokens=tokens)
