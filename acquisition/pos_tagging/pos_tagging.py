@@ -69,7 +69,8 @@ def train_classifier(model_path, classifier_config, binary, dataset):
 def run_pos_tagging_experiment(noise_images, version, dataset):
     config = ClassifierConfig()
     config.classifier_type = 'svm'
-    os.remove(f'cache_dir/{dataset}_features')
+    if os.path.isfile(f'cache_dir/{dataset}_features'):
+        os.remove(f'cache_dir/{dataset}_features')
     noise_images_str = ''
     if noise_images:
         noise_images_str = '_noise_images'
