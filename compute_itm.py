@@ -1,4 +1,4 @@
-from embed import load_model
+from acquisition.embed import load_model
 from PIL import Image
 import torch
 from vilt.transforms import pixelbert_transform

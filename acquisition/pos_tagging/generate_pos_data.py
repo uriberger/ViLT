@@ -6,9 +6,9 @@ from acquisition.config import cache_dir
 from tqdm import tqdm
 from acquisition.config import pos_tag_to_class
 
-def generate_pos_data(sentences, binary):
+def generate_pos_data(sentences, binary, filename):
     binary_str = '_binary' if binary else ''
-    file_name = f'flickr_pos_data{binary_str}.json'
+    file_name = f'{filename}_pos_data{binary_str}.json'
     file_path = os.path.join(cache_dir, file_name)
     if os.path.isfile(file_path):
         with open(file_path, 'r') as fp:
