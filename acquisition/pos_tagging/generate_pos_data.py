@@ -6,7 +6,14 @@ from acquisition.config import cache_dir
 from tqdm import tqdm
 from acquisition.config import pos_tag_to_class
 
-def generate_pos_data(sentences, binary, filename):
+def generate_pos_data(sentences, binary, filename, pos_tag='noun'):
+    if pos_tag == 'noun':
+        class_ind = 0
+    elif pos_tag == 'verb':
+        class_ind = 1
+    elif pos_tag == 'adjective':
+        class_ind = 2
+
     binary_str = '_binary' if binary else ''
     file_name = f'{filename}_pos_data{binary_str}.json'
     file_path = os.path.join(cache_dir, file_name)
@@ -30,7 +37,7 @@ def generate_pos_data(sentences, binary, filename):
                     {
                         'text': token.text,
                         'start_position': token.start_position,
-                        'label': 1 if pos_tag_to_class[token.annotation_layers['pos'][0]._value] == 0 else 0
+                        'label': 1 if pos_tag_to_class[token.annotation_layers['pos'][0]._value] == class_ind else 0
                     } for token in sentence_obj
                 ])
             else:
