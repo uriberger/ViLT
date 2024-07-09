@@ -56,12 +56,19 @@ def get_data(model_path, binary, dataset, pos_tag='noun'):
     for feature_vectors, pos_data in zip(features, pos_data):
         if feature_vectors is None or feature_vectors.shape[0] != len(pos_data):
             continue
-        data += [(feature_vectors[i], pos_data[i]['label']) for i in range(len(pos_data))]
+        data += [(feature_vectors[i], pos_data[i]['label'], pos_data[i]['text']) for i in range(len(pos_data))]
 
     random.shuffle(data)
-    train_sample_num = int(0.8*len(data))
-    train_data = data[:train_sample_num]
-    test_data = data[train_sample_num:]
+    vocab = list(set([x[2].lower() for x in data]))
+    train_words_num = int(0.8*len(vocab))
+    test_words = set(vocab[train_words_num:])
+    train_data = []
+    test_data = []
+    for feature_vector, pos_tag, word in data:
+        if word.lower() in test_words:
+            test_data.append((feature_vector, pos_tag))
+        else:
+            train_data.append((feature_vector, pos_tag))
 
     return train_data, test_data
 
