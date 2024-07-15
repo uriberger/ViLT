@@ -7,7 +7,7 @@ from tqdm import tqdm
 from acquisition.config import pos_tag_to_class
 
 def generate_pos_data(sentences, binary, filename, pos_tag='noun'):
-    pos_tag2class_ind = {'noun': 0, 'verb': 1, 'adjective': 2}
+    pos_tag2class_ind = {'noun': 0, 'verb': 1, 'adjective': 2, 'adverb': 3, 'function': 4, 'other': 5}
     if type(pos_tag) == str:
         class_inds = [pos_tag2class_ind[pos_tag]]
     elif type(pos_tag) == list:

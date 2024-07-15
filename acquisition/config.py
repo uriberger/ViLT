@@ -12,9 +12,13 @@ class_to_pos_tag = [
     ['VBD', 'VB', 'VBP', 'VBG', 'VBZ', 'VBN', 'VERB'],
     # Adjectivs:
     ['JJ', 'JJR', 'JJS'],
+    # Adverbs:
+    ['RB', 'RBR', 'RBS'],
+    # Function:
+    ['DT', 'IN'],
     # Others:
-    ['<unk>', 'UH', ',', 'PRP', 'PRP$', 'RB', '.', 'DT', 'O', 'IN', 'CD', 'WRB', 'WDT',
-     'CC', 'TO', 'MD', ':', 'RP', 'EX', 'FW', 'XX', 'HYPH', 'POS', 'RBR', 'PDT', 'RBS',
+    ['<unk>', 'UH', ',', 'PRP', 'PRP$', '.', 'DT', 'O', 'CD', 'WRB', 'WDT',
+     'CC', 'TO', 'MD', ':', 'RP', 'EX', 'FW', 'XX', 'HYPH', 'POS', 'PDT',
      'AFX', '-LRB-', '-RRB-', '``', "''", 'LS', '$', 'SYM', 'ADD', '*', 'NFP']
 ]
 pos_tag_to_class = {}
