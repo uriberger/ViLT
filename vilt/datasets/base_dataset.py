@@ -22,7 +22,8 @@ class BaseDataset(torch.utils.data.Dataset):
         draw_false_image=0,
         draw_false_text=0,
         image_only=False,
-        noise_images=False
+        noise_images=False,
+        random_images=False
     ):
         """
         data_dir : where dataset file *.arrow lives; existence should be guaranteed via DataModule.prepare_data
@@ -40,6 +41,7 @@ class BaseDataset(torch.utils.data.Dataset):
         self.draw_false_text = draw_false_text
         self.image_only = image_only
         self.noise_images = noise_images
+        self.random_images = random_images
         self.data_dir = data_dir
         self.generated_sample_image = False
 
@@ -96,7 +98,13 @@ class BaseDataset(torch.utils.data.Dataset):
         return Image.open(image_bytes).convert("RGB")
 
     def get_image(self, index, image_key="image"):
-        image = self.get_raw_image(index, image_key=image_key)
+        if self.random_images:
+            random_index = random.randint(0, len(self.index_mapper) - 1)
+            image = self.get_raw_image(random_index, image_key=image_key)
+            if not self.generated_sample_image:
+                print('NOTE: randomly selecting images')
+        else:
+            image = self.get_raw_image(index, image_key=image_key)
         if self.noise_images:
             imarray = np.random.rand(image.size[1], image.size[0], 3)*255
             image = Image.fromarray(imarray.astype('uint8')).convert('RGB')

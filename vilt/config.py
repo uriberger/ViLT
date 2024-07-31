@@ -23,6 +23,7 @@ def config():
     datasets = ["coco", "vg", "sbu", "gcc"]
     loss_names = _loss_names({"itm": 1, "mlm": 1})
     batch_size = 4096  # this is a desired batch size; pl trainer will accumulate gradients when per step batch is smaller.
+    save_every_n_steps = 0
 
     # Image setting
     train_transform_keys = ["pixelbert"]
@@ -33,6 +34,7 @@ def config():
     draw_false_image = 1
     image_only = False
     noise_images = False
+    random_images = False
 
     # Text Setting
     vqav2_label_size = 3129

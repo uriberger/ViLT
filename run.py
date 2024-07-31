@@ -18,16 +18,28 @@ def main(_config):
     exp_name = f'{_config["exp_name"]}'
 
     os.makedirs(_config["log_dir"], exist_ok=True)
-    checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        save_top_k=-1,
-        verbose=True,
-        monitor="val/the_metric",
-        mode="max",
-        save_last=True,
-    )
+    if _config["save_every_n_steps"] > 0:
+            checkpoint_callback = pl.callbacks.ModelCheckpoint(
+            save_top_k=-1,
+            verbose=True,
+            monitor="val/the_metric",
+            mode="max",
+            save_last=True,
+            every_n_train_steps=_config["save_every_n_steps"],
+        )
+    else:
+        checkpoint_callback = pl.callbacks.ModelCheckpoint(
+            save_top_k=-1,
+            verbose=True,
+            monitor="val/the_metric",
+            mode="max",
+            save_last=True,
+        )
     logger_name = f'{exp_name}_seed{_config["seed"]}'
     if _config["noise_images"]:
         logger_name += '_noise_images'
+    if _config["random_images"]:
+        logger_name += '_random_images'
     logger = pl.loggers.TensorBoardLogger(
         _config["log_dir"],
         name=logger_name,
