@@ -102,7 +102,7 @@ class BaseDataset(torch.utils.data.Dataset):
             random_index = random.randint(0, len(self.index_mapper) - 1)
             image = self.get_raw_image(random_index, image_key=image_key)
             if not self.generated_sample_image:
-                print('NOTE: randomly selecting images')
+                print('NOTE: randomly selecting images', flush=True)
         else:
             image = self.get_raw_image(index, image_key=image_key)
         if self.noise_images:
